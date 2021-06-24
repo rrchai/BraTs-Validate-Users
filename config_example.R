@@ -3,10 +3,10 @@ config <- list(
   first_name_question = "What is your first name?",
   last_name_question = "What is your last name?",
   username_question = "What is your synapse user id?",
-  preregistrant_teamID = ""  # registrant team ID,
-  validated_teamID = ""  # validated team ID,
-  your_email_address = ""  # email address that have access to google form/sheet,
-  working_dir_path = ""  # <full-path/to/BraTs-Validate-Users/
+  preregistrant_teamID = "",  # registrant team ID
+  validated_teamID = "",  # validated team ID
+  your_email_address = "",  # email address that have access to google form/sheet
+  working_dir_path = "",  # <full-path/to/BraTs-Validate-Users/
   synapse_api_key = ""
 )
 

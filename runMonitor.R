@@ -1,4 +1,4 @@
-
+print(getwd())
 source("config.R")
 require(cronR)
 # list the contents of a crontab

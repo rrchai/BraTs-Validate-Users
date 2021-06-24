@@ -2,8 +2,10 @@
 .Rhistory
 .Rapp.history
 
-# Session Data files
+# Data files
 .RData
+tmp
+validateResponse.log
 
 # User-specific files
 .Ruserdata
@@ -35,5 +37,9 @@ vignettes/*.pdf
 *.utf8.md
 *.knit.md
 
-# R Environment Variables
+# Environment Variables
 .Renviron
+config.R
+Dockerfile
+# requirements.R
+# requirements.txt

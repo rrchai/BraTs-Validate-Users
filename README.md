@@ -2,6 +2,12 @@
 
 ## Installation
 
+Clone the repo
+
+```Bash
+git clone https://github.com/rrchai/BraTs-Validate-Users
+```
+
 Initiate Conda Environment
 
 ```Bash

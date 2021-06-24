@@ -92,7 +92,7 @@ if (file.exists("tmp/after.csv")) {
             cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "mismatched names"), sep = ","))  # log
           }
           cat(msg) #log
-          invisible(syn$sendMessage(userIds = list("3417574"), messageSubject = "Form Response Validation Results", messageBody = msg))
+          invisible(syn$sendMessage(userIds = list(""), messageSubject = "Form Response Validation Results", messageBody = msg))
         })
       )
     }
@@ -124,7 +124,7 @@ if (file.exists("tmp/after.csv")) {
             cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "not in the preregistrant team"), sep = ","))  # log
           }
           # if username is incorrect, then you wont' get an email, since we cant get their userId
-          try(invisible(syn$sendMessage(userIds = list("3417574"), messageSubject = "Form Response Validation Results", messageBody = msg)), 
+          try(invisible(syn$sendMessage(userIds = list(""), messageSubject = "Form Response Validation Results", messageBody = msg)), 
               slient = TRUE)
         })
       )
