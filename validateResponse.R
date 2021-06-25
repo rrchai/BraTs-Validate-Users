@@ -133,25 +133,25 @@ if (file.exists("tmp/after.csv")) {
               "and submit the <a href='", config$google_form_url, "' target='_blank'>google form</a>", " again.<br><br>",
               footer
             )
+          }
+          
+          id <- try(syn$getUserProfile(usr), silent = TRUE)["ownerId"] # hope user don't give crazy username, "null", "NUL", ""
 
-            id <- try(syn$getUserProfile(usr), silent = TRUE)["ownerId"] # hope user don't give crazy username, "null", "NUL", ""
-
-            if (is.na(id)) {
-              # if username is incorrect, then you wont' get an email, since we cant get their userId
-              cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "username not found\n"), collapse = ","),
-                file = "log/out.log", append = TRUE
+          if (is.na(id)) {
+            # if username is incorrect, then you wont' get an email, since we cant get their userId
+            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "username not found\n"), collapse = ","),
+              file = "log/out.log", append = TRUE
+            )
+          } else {
+            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "not in the preregistrant team\n"), collapse = ","),
+              file = "log/out.log", append = TRUE
+            )
+            invisible(
+              syn$sendMessage(
+                userIds = list(""), messageSubject = "Form Response Validation Results",
+                messageBody = msg, contentType = "text/html"
               )
-            } else {
-              cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "not in the preregistrant team\n"), collapse = ","),
-                file = "log/out.log", append = TRUE
-              )
-              invisible(
-                syn$sendMessage(
-                  userIds = list(""), messageSubject = "Form Response Validation Results",
-                  messageBody = msg, contentType = "text/html"
-                )
-              )
-            }
+            )
           }
         })
       )
