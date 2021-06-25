@@ -22,8 +22,7 @@ if (file.exists("tmp/after.csv")) {
     new_response <- anti_join(new_data, old_data, by = colnames(new_data)) %>%
       setNames(janitor::make_clean_names(colnames(.))) %>%
       select(timestamp, questions[[1]], questions[[2]], questions[[3]]) %>%
-      setNames(c("timestamp", "firstName", "lastName", "userId")) %>%
-      mutate(timestamp = as.Date(timestamp))
+      setNames(c("timestamp", "firstName", "lastName", "userId"))
 
     new_userIds <- unique(new_response$userId)
 
@@ -133,7 +132,7 @@ if (file.exists("tmp/after.csv")) {
           }
           # if username is incorrect, then you wont' get an email, since we cant get their userId
           try(invisible(syn$sendMessage(userIds = list(""), messageSubject = "Form Response Validation Results", messageBody = msg)),
-            slient = TRUE
+            silent = TRUE
           )
         })
       )
