@@ -44,7 +44,7 @@ if (file.exists("tmp/after.csv")) {
       )
     )
 
-    team2_memberIds <- setdiff(un$userName, diff$userName)
+    team2_members <- setdiff(un$userName, diff$userName)
 
     footer <- "Thank you!<br><br>Challenge Administrator"
     # find user who is in the diff, aka users in the pre-registrant team, but not in the validate team
@@ -55,8 +55,9 @@ if (file.exists("tmp/after.csv")) {
         lapply(waitList_users, function(usr) {
           # compare first name, last name and user name
           a <- new_response %>%
-            filter(userName == usr & timestamp == max(timestamp)) %>%
+            filter(userName == usr) %>%
             # only take the latest submission
+            filter(timestamp == max(timestamp)) %>%
             select(-timestamp) %>%
             as.character()
           b <- diff %>%
@@ -116,7 +117,7 @@ if (file.exists("tmp/after.csv")) {
       invisible(
         lapply(not_waitList_users, function(usr) {
           # if users not in the pre-registrant team, but already in the validate team, like admin
-          if (usr %in% team2_memberIds) {
+          if (usr %in% team2_members) {
             msg <- paste0(
               "Hello ", usr, ",<br><br>",
               "You are already in the validated team.<br><br>",
