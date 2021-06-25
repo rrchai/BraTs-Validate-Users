@@ -79,7 +79,7 @@ if (file.exists("tmp/after.csv")) {
               "The invitation has been sent, please accept and join the validated Team.<br><br>",
               footer
             )
-            # log
+
             cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "validate\n"), collapse = ","),
               file = "log/out.log", append = TRUE
             )
@@ -99,7 +99,7 @@ if (file.exists("tmp/after.csv")) {
               "and submit the <a href='", config$google_form_url, "' target='_blank'>google form</a>", " again.<br><br>",
               footer
             )
-            # log
+
             cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "mismatched names\n"), collapse = ","),
               file = "log/out.log", append = TRUE
             )
@@ -117,16 +117,12 @@ if (file.exists("tmp/after.csv")) {
     # find who is not in the diff:
     # they could not in the preregistrant team yet or
     # already in the validated team
-    not_waitList_users <- lapply(setdiff(new_usernames, diff$userName), function(id) {
-      user <- syn$getUserProfile(id)
-      list(userName = user["userName"], userId = user["ownerId"])
-    })
+    not_waitList_users <- setdiff(new_usernames, diff$userName)
 
     if (length(not_waitList_users) != 0) {
       invisible(
-        lapply(seq_along(not_waitList_users), function(i) {
-          usr <- not_waitList_users[[i]]["userName"]
-          id <- not_waitList_users[[i]]["userId"]
+        lapply(seq_along(not_waitList_users), function(usr) {
+
           # if users not in the pre-registrant team, but already in the validate team, like admin
           if (usr %in% team2_memberIds) {
             msg <- paste0(
@@ -134,7 +130,7 @@ if (file.exists("tmp/after.csv")) {
               "You are already in the validated team.<br><br>",
               footer
             )
-            # log
+
             cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "already in the validated team\n"), collapse = ","),
               file = "log/out.log", append = TRUE
             )
@@ -146,20 +142,27 @@ if (file.exists("tmp/after.csv")) {
               "and submit the <a href='", config$google_form_url, "' target='_blank'>google form</a>", " again.<br><br>",
               footer
             )
-            # log
-            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "not in the preregistrant team\n"), collapse = ","),
-              file = "log/out.log", append = TRUE
-            )
+
+            id <- try(syn$getUserProfile(usr), silent = TRUE)["ownerId"] # hope user don't give crazy username, "null", "NUL", ""
+
+            if (is.na(id)) {
+              # if username is incorrect, then you wont' get an email, since we cant get their userId
+              cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "username not found\n"), collapse = ","),
+                file = "log/out.log", append = TRUE
+              )
+            } else {
+              cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "not in the preregistrant team\n"), collapse = ","),
+                file = "log/out.log", append = TRUE
+              )
+
+              invisible(
+                syn$sendMessage(
+                  userIds = list(""), messageSubject = "Form Response Validation Results",
+                  messageBody = msg, contentType = "text/html"
+                )
+              )
+            }
           }
-          # if username is incorrect, then you wont' get an email, since we cant get their userId
-          try(invisible(
-            syn$sendMessage(
-              userIds = list(""), messageSubject = "Form Response Validation Results",
-              messageBody = msg, contentType = "text/html"
-            )
-          ),
-          silent = TRUE
-          )
         })
       )
     }
