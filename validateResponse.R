@@ -13,8 +13,8 @@ if (!file.exists("tmp/before.csv")) {
 # validation ----------------------------------------------------------
 if (file.exists("tmp/after.csv")) {
   # read all characters to avoid errors for empty sheet
-  old_data <- readr::read_csv("tmp/before.csv", col_types = cols())
-  new_data <- readr::read_csv("tmp/after.csv", col_types = cols())
+  old_data <- readr::read_csv("tmp/before.csv", col_types = cols(.default = "c"))
+  new_data <- readr::read_csv("tmp/after.csv", col_types = cols(.default = "c"))
 
   if (!identical(old_data, new_data, ignore.environment = TRUE)) {
 

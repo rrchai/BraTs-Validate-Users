@@ -33,7 +33,7 @@ cp config_example.R config.R
 
 1. Open the `setup.R` file in the Rstudio
 2. press <kbd>Control</kbd>/<kbd>Command</kbd> + <kbd>A</kbd> to select entire script
-3. press <kbd>Control</kbd>/<kbd>Command</kbd> + <kbd>enter<kbd> to run all the codes
+3. press <kbd>Control</kbd>/<kbd>Command</kbd> + <kbd>enter</kbd> to run all the codes
 4. Press `1` in the console when it asks to select "1: Yes 2: No" and a browser window will pop up. Please sign in your google account which has access to the google sheet and complete the authentication.
 
 If not the first time, simply run below code to test if all setup work and go to the next step if no errors.
