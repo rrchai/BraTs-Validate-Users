@@ -31,7 +31,7 @@ if (file.exists("tmp/after.csv")) {
     diff <- pd$DataFrame(
       cu$teams$team_members_diff(
         syn,
-        config$pregistrant_teamID,
+        config$preregistrant_teamID,
         config$validated_teamID
       )
     )
@@ -39,7 +39,7 @@ if (file.exists("tmp/after.csv")) {
     un <- pd$DataFrame(
       cu$teams$team_members_union(
         syn,
-        config$pregistrant_teamID,
+        config$preregistrant_teamID,
         config$validated_teamID
       )
     )
