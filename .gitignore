@@ -42,4 +42,4 @@ vignettes/*.pdf
 config.R
 Dockerfile
 # requirements.R
-# requirements.txt
+requirements.txt

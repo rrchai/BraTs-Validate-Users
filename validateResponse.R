@@ -18,6 +18,7 @@ if (file.exists("tmp/after.csv")) {
   if (!identical(old_data, new_data, ignore.environment = TRUE)) {
 
     # identify new submissions
+    old_data$Timestamp <- as.Date(old_data$Timestamp) # avoid error for empty sheet 1st time
     new_response <- anti_join(new_data, old_data, by = colnames(new_data)) %>%
       setNames(janitor::make_clean_names(colnames(.))) %>%
       select(timestamp, questions[[1]], questions[[2]], questions[[3]]) %>%
