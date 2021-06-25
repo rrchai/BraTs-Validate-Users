@@ -16,6 +16,7 @@ config <- list(
 
 #### example
 # config <- list(
+#   google_form_url = "https://docs.google.com/forms/1w23213124asd" 
 #   google_sheet_url = "https://docs.google.com/spreadsheets/1w23213124asd",
 #   first_name_question = "What is your first name?",
 #   last_name_question = "What is your last name?",
