@@ -57,6 +57,8 @@ if (file.exists("tmp/after.csv")) {
       invisible(
         lapply(seq_along(waitList_users), function(i) {
           usr <- waitList_users[[i]]["userName"]
+          id <- not_waitList_users[[i]]["userId"]
+
           # compare first name, last name and user name
           a <- new_response %>%
             filter(userName == usr & timestamp == max(timestamp)) %>%
@@ -70,40 +72,44 @@ if (file.exists("tmp/after.csv")) {
 
           if (identical(a, b)) { # if validate
             # invite to the team
-            # syn$invite_to_team(teamIDs$validate_teamID, id)
+            # syn$invite_to_team(config$validated_teamID, id)
 
             msg <- paste0(
               "Hello ", usr, ",<br><br>",
               "The invitation has been sent, please accept and join the validated Team.<br><br>",
               footer
             )
+            # log
             cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "validate\n"), collapse = ","),
               file = "log/out.log", append = TRUE
-            ) # log
+            )
           } else { # if not validate
             inx <- which(a != b)
             errorMsg <- sapply(inx, function(i) {
               paste0(
                 colnames(new_response)[-1][i], ": '",
                 a[i], "' does not match the '",
-                b[i], "' in your synapse profile\n"
+                b[i], "' in your synapse profile<br>"
               )
             }) %>% paste0(collapse = "")
             msg <- paste0(
               "Hello ", usr, ",<br><br>",
               errorMsg, "<br>",
               "Please double check your filled information that matches your synapse profile ",
-              "and submit the <a href='", config$google_form_url, "' target='_blank'>google form</a>" , " again.<br><br>",
+              "and submit the <a href='", config$google_form_url, "' target='_blank'>google form</a>", " again.<br><br>",
               footer
             )
+            # log
             cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "mismatched names\n"), collapse = ","),
               file = "log/out.log", append = TRUE
-            ) # log
+            )
           }
           invisible(
-            syn$sendMessage(userIds = list(""), messageSubject = "Form Response Validation Results",
-                            messageBody = msg, contentType = "text/html")
+            syn$sendMessage(
+              userIds = list(""), messageSubject = "Form Response Validation Results",
+              messageBody = msg, contentType = "text/html"
             )
+          )
         })
       )
     }
@@ -120,6 +126,7 @@ if (file.exists("tmp/after.csv")) {
       invisible(
         lapply(seq_along(not_waitList_users), function(i) {
           usr <- not_waitList_users[[i]]["userName"]
+          id <- not_waitList_users[[i]]["userId"]
           # if users not in the pre-registrant team, but already in the validate team, like admin
           if (usr %in% team2_memberIds) {
             msg <- paste0(
@@ -136,7 +143,7 @@ if (file.exists("tmp/after.csv")) {
               "Hello ", usr, ",<br><br>",
               "You are not in the preregistrant team<br><br>",
               "Please register the challenge first and ",
-              "and submit the <a href='", config$google_form_url, "' target='_blank'>google form</a>" , " again.<br><br>",
+              "and submit the <a href='", config$google_form_url, "' target='_blank'>google form</a>", " again.<br><br>",
               footer
             )
             # log
@@ -146,10 +153,12 @@ if (file.exists("tmp/after.csv")) {
           }
           # if username is incorrect, then you wont' get an email, since we cant get their userId
           try(invisible(
-            syn$sendMessage(userIds = list(""), messageSubject = "Form Response Validation Results",
-                            messageBody = msg, contentType = "text/html")
-            ),
-            silent = TRUE
+            syn$sendMessage(
+              userIds = list(""), messageSubject = "Form Response Validation Results",
+              messageBody = msg, contentType = "text/html"
+            )
+          ),
+          silent = TRUE
           )
         })
       )
