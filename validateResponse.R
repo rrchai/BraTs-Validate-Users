@@ -52,8 +52,7 @@ if (file.exists("tmp/after.csv")) {
 
     if (length(waitList_users) != 0) {
       invisible(
-        lapply(seq_along(waitList_users), function(usr) {
-
+        lapply(waitList_users, function(usr) {
           # compare first name, last name and user name
           a <- new_response %>%
             filter(userName == usr & timestamp == max(timestamp)) %>%
@@ -115,8 +114,7 @@ if (file.exists("tmp/after.csv")) {
 
     if (length(not_waitList_users) != 0) {
       invisible(
-        lapply(seq_along(not_waitList_users), function(usr) {
-
+        lapply(not_waitList_users, function(usr) {
           # if users not in the pre-registrant team, but already in the validate team, like admin
           if (usr %in% team2_memberIds) {
             msg <- paste0(
