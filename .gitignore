@@ -5,6 +5,7 @@
 # Data files
 .RData
 tmp
+log
 validateResponse.log
 
 # User-specific files

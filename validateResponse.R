@@ -3,6 +3,7 @@ source("setup.R")
 
 # prepare detecting new submissions
 dir.create("tmp", showWarnings = FALSE)
+dir.create("log", showWarnings = FALSE)
 # tools::md5sum("tmp_old.csv") != tools::md5sum("tmp_new.csv")
 if (!file.exists("tmp/before.csv")) {
   readr::write_csv(response, "tmp/before.csv")
@@ -22,9 +23,9 @@ if (file.exists("tmp/after.csv")) {
     new_response <- anti_join(new_data, old_data, by = colnames(new_data)) %>%
       setNames(janitor::make_clean_names(colnames(.))) %>%
       select(timestamp, questions[[1]], questions[[2]], questions[[3]]) %>%
-      setNames(c("timestamp", "firstName", "lastName", "userId"))
+      setNames(c("timestamp", "firstName", "lastName", "userName"))
 
-    new_userIds <- unique(new_response$userId)
+    new_usernames <- unique(new_response$userName)
 
     # find difference of users between two teams
     diff <- pd$DataFrame(
@@ -47,15 +48,15 @@ if (file.exists("tmp/after.csv")) {
 
     footer <- "Thank you!\n\nChallenge Administrator\n"
     # find user who is in the diff, aka users in the pre-registrant team, but not in the validate team
-    waitList_users <- lapply(intersect(new_userIds, diff$userName), function(id) {
+    waitList_users <- lapply(intersect(new_usernames, diff$userName), function(id) {
       user <- syn$getUserProfile(id)
-      list(username = user["userName"], userId = user["ownerId"])
+      list(userName = user["userName"], userId = user["ownerId"])
     })
 
     if (length(waitList_users) != 0) {
       invisible(
         lapply(seq_along(waitList_users), function(i) {
-          usr <- waitList_users[[i]]["username"]
+          usr <- waitList_users[[i]]["userName"]
           # compare first name, last name and user name
           a <- new_response %>%
             filter(userId == usr & timestamp == max(timestamp)) %>%
@@ -76,7 +77,9 @@ if (file.exists("tmp/after.csv")) {
               "The invitation has been sent, please accept and join the validated Team.\n\n",
               footer
             )
-            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "validate"), sep = ",")) # log
+            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "validate\n"), collapse = ","),
+              file = "log/out.log", append = TRUE
+            ) # log
           } else { # if not validate
             inx <- which(a != b)
             errorMsg <- sapply(inx, function(i) {
@@ -93,9 +96,10 @@ if (file.exists("tmp/after.csv")) {
               " and submit the google form again.\n\n",
               footer
             )
-            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "mismatched names"), sep = ",")) # log
+            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "mismatched names"), collapse = ","),
+              file = "log/out.log", append = TRUE
+            ) # log
           }
-          cat(msg) # log
           invisible(syn$sendMessage(userIds = list(""), messageSubject = "Form Response Validation Results", messageBody = msg))
         })
       )
@@ -104,15 +108,15 @@ if (file.exists("tmp/after.csv")) {
     # find who is not in the diff:
     # they could not in the preregistrant team yet or
     # already in the validated team
-    not_waitList_users <- lapply(setdiff(new_userIds, diff$userName), function(id) {
+    not_waitList_users <- lapply(setdiff(new_usernames, diff$userName), function(id) {
       user <- syn$getUserProfile(id)
-      list(username = user["userName"], userId = user["ownerId"])
+      list(userName = user["userName"], userId = user["ownerId"])
     })
 
     if (length(not_waitList_users) != 0) {
       invisible(
         lapply(seq_along(not_waitList_users), function(i) {
-          usr <- not_waitList_users[[i]]["username"]
+          usr <- not_waitList_users[[i]]["userName"]
           # if users not in the pre-registrant team, but already in the validate team, like admin
           if (usr %in% team2_memberIds) {
             msg <- paste0(
@@ -120,7 +124,9 @@ if (file.exists("tmp/after.csv")) {
               "You are already in the validated team.\n\n",
               footer
             )
-            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "already in the validated team"), sep = ",")) # log
+            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "already in the validated team"), collapse = ","),
+              file = "log/out.log", append = TRUE
+            ) # log
           } else { # if user not in either of team
             msg <- paste0(
               "Hello ", usr, ",\n\n",
@@ -128,7 +134,9 @@ if (file.exists("tmp/after.csv")) {
               "Please register the challenge first and submit the google form again.\n\n",
               footer
             )
-            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "not in the preregistrant team"), sep = ",")) # log
+            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "not in the preregistrant team"), collapse = ","),
+              file = "log/out.log", append = TRUE
+            ) # log
           }
           # if username is incorrect, then you wont' get an email, since we cant get their userId
           try(invisible(syn$sendMessage(userIds = list(""), messageSubject = "Form Response Validation Results", messageBody = msg)),

@@ -1,3 +1,5 @@
+Sys.setenv(TZ='UTC')
+
 suppressPackageStartupMessages({
   library(googlesheets4)
   library(reticulate)
@@ -24,8 +26,6 @@ questions <- lapply(
 )
 
 # hide warning
-oldw <- getOption("warn")
-options(warn = -1) # options(warn = oldw)
 options(gargle_oauth_email = config$your_email_address) # for googlesheet
 
 # load py modules
@@ -47,4 +47,5 @@ suppressMessages(
   ) %>%
   setNames(janitor::make_clean_names(colnames(.)))
 )
-if (any(sapply(questions, function(i) !i %in% colnames(response)))) stop("not all questions matched")
+
+# if (any(sapply(questions, function(i) !i %in% colnames(response)))) stop("not all questions matched")
