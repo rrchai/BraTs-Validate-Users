@@ -97,7 +97,7 @@ if (file.exists("tmp/after.csv")) {
               file = "log/out.log", append = TRUE
             )
           }
-          id <- syn$getUserProfile(usr)["userId"]
+          id <- syn$getUserProfile(usr)["ownerId"]
           invisible(
             syn$sendMessage(
               userIds = list(""), messageSubject = "Form Response Validation Results",
