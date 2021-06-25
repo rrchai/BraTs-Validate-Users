@@ -7,7 +7,7 @@ suppressPackageStartupMessages({
 })
 
 # read config
-source(config.R)
+source("config.R")
 
 # hide warning
 oldw <- getOption("warn")
@@ -16,10 +16,15 @@ options(gargle_oauth_email = config$your_email_address) # for googlesheet
 
 # TODO: add testing for input, now assume config is fine
 # clean up config info
-url <- toString(config$google_sheet_url)
-questions <- lapply(config[2:4], function(x) toString(x) %>% janitor::make_clean_names())
-teamIDs <- lapply(config[5:6], function(x) toString(x))
-token <- toString(config$synapse_api_key)
+config <- lapply(config, function(x) toString(x) %>% trimws("both"))
+questions <- lapply(
+  config[c(
+    "first_name_question",
+    "last_name_question",
+    "username_question"
+  )],
+  janitor::make_clean_names
+)
 
 # load py modules
 use_condaenv("brats-tool", required = TRUE)
@@ -29,7 +34,7 @@ synapseclient <- reticulate::import("synapseclient")
 
 # log in to synapse
 syn <- synapseclient$Synapse()
-invisible(reticulate::py_capture_output(syn$login(apiKey = token), type = "stdout"))
+syn$login(config$username, config$password, silent = TRUE)
 
 # Reading google sheet from response of form
-suppressMessages(response <- remove_empty(read_sheet(url), which = "rows"))
+suppressMessages(response <- remove_empty(read_sheet(config$google_sheet_url), which = "rows"))
