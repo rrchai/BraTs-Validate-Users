@@ -47,4 +47,4 @@ suppressMessages(
   ) %>%
   setNames(janitor::make_clean_names(colnames(.)))
 )
-if (any(sapply(questions, function(i) i %in% colnames(response)))) stop("not all questions matched")
+if (any(sapply(questions, function(i) !i %in% colnames(response)))) stop("not all questions matched")

@@ -12,17 +12,18 @@ if (!file.exists("tmp/before.csv")) {
 
 # validation ----------------------------------------------------------
 if (file.exists("tmp/after.csv")) {
+  # read all characters to avoid errors for empty sheet
   old_data <- readr::read_csv("tmp/before.csv", col_types = cols())
   new_data <- readr::read_csv("tmp/after.csv", col_types = cols())
 
   if (!identical(old_data, new_data, ignore.environment = TRUE)) {
 
     # identify new submissions
-    old_data$Timestamp <- as.Date(old_data$Timestamp) # avoid error for empty sheet 1st time
     new_response <- anti_join(new_data, old_data, by = colnames(new_data)) %>%
       setNames(janitor::make_clean_names(colnames(.))) %>%
       select(timestamp, questions[[1]], questions[[2]], questions[[3]]) %>%
-      setNames(c("timestamp", "firstName", "lastName", "userId"))
+      setNames(c("timestamp", "firstName", "lastName", "userId")) %>%
+      mutate(timestamp = as.Date(timestamp))
 
     new_userIds <- unique(new_response$userId)
 
