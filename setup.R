@@ -42,7 +42,7 @@ syn$login(config$username, config$password, silent = TRUE)
 # need to successfully authenticate once in an interactive session
 suppressMessages(
   response <- remove_empty(
-    read_sheet(config$google_sheet_url, trimws = TRUE), 
+    read_sheet(config$google_sheet_url, trim_ws = TRUE), 
     which = "rows"
   ) %>%
   setNames(janitor::make_clean_names(colnames(.)))
