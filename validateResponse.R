@@ -48,16 +48,11 @@ if (file.exists("tmp/after.csv")) {
 
     footer <- "Thank you!<br><br>Challenge Administrator"
     # find user who is in the diff, aka users in the pre-registrant team, but not in the validate team
-    waitList_users <- lapply(intersect(new_usernames, diff$userName), function(id) {
-      user <- syn$getUserProfile(id)
-      list(userName = user["userName"], userId = user["ownerId"])
-    })
+    waitList_users <- intersect(new_usernames, diff$userName)
 
     if (length(waitList_users) != 0) {
       invisible(
-        lapply(seq_along(waitList_users), function(i) {
-          usr <- waitList_users[[i]]["userName"]
-          id <- not_waitList_users[[i]]["userId"]
+        lapply(seq_along(waitList_users), function(usr) {
 
           # compare first name, last name and user name
           a <- new_response %>%
@@ -79,7 +74,6 @@ if (file.exists("tmp/after.csv")) {
               "The invitation has been sent, please accept and join the validated Team.<br><br>",
               footer
             )
-
             cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "validate\n"), collapse = ","),
               file = "log/out.log", append = TRUE
             )
@@ -99,11 +93,11 @@ if (file.exists("tmp/after.csv")) {
               "and submit the <a href='", config$google_form_url, "' target='_blank'>google form</a>", " again.<br><br>",
               footer
             )
-
             cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "mismatched names\n"), collapse = ","),
               file = "log/out.log", append = TRUE
             )
           }
+          id <- syn$getUserProfile(usr)["userId"]
           invisible(
             syn$sendMessage(
               userIds = list(""), messageSubject = "Form Response Validation Results",
@@ -130,7 +124,6 @@ if (file.exists("tmp/after.csv")) {
               "You are already in the validated team.<br><br>",
               footer
             )
-
             cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "already in the validated team\n"), collapse = ","),
               file = "log/out.log", append = TRUE
             )
@@ -154,7 +147,6 @@ if (file.exists("tmp/after.csv")) {
               cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "not in the preregistrant team\n"), collapse = ","),
                 file = "log/out.log", append = TRUE
               )
-
               invisible(
                 syn$sendMessage(
                   userIds = list(""), messageSubject = "Form Response Validation Results",
