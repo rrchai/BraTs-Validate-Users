@@ -1,6 +1,7 @@
 # fill information in the double string. Note: questions need to match in the google form
 
 config <- list(
+  google_form_url = "", # link to your google form
   google_sheet_url = "", # link to your google sheet reponse
   first_name_question = "", # your google form question for first name
   last_name_question = "", # your google form question for last name

@@ -46,7 +46,7 @@ if (file.exists("tmp/after.csv")) {
 
     team2_memberIds <- setdiff(un$userName, diff$userName)
 
-    footer <- "Thank you!\n\nChallenge Administrator\n"
+    footer <- "Thank you!<br><br>Challenge Administrator"
     # find user who is in the diff, aka users in the pre-registrant team, but not in the validate team
     waitList_users <- lapply(intersect(new_usernames, diff$userName), function(id) {
       user <- syn$getUserProfile(id)
@@ -59,7 +59,7 @@ if (file.exists("tmp/after.csv")) {
           usr <- waitList_users[[i]]["userName"]
           # compare first name, last name and user name
           a <- new_response %>%
-            filter(userId == usr & timestamp == max(timestamp)) %>%
+            filter(userName == usr & timestamp == max(timestamp)) %>%
             # only take the latest submission
             select(-timestamp) %>%
             as.character()
@@ -73,8 +73,8 @@ if (file.exists("tmp/after.csv")) {
             # syn$invite_to_team(teamIDs$validate_teamID, id)
 
             msg <- paste0(
-              "Hello ", usr, ",\n\n",
-              "The invitation has been sent, please accept and join the validated Team.\n\n",
+              "Hello ", usr, ",<br><br>",
+              "The invitation has been sent, please accept and join the validated Team.<br><br>",
               footer
             )
             cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "validate\n"), collapse = ","),
@@ -90,17 +90,20 @@ if (file.exists("tmp/after.csv")) {
               )
             }) %>% paste0(collapse = "")
             msg <- paste0(
-              "Hello ", usr, ",\n\n",
-              errorMsg, "\n",
-              "Please double check your filled information that matches your synapse profile",
-              " and submit the google form again.\n\n",
+              "Hello ", usr, ",<br><br>",
+              errorMsg, "<br>",
+              "Please double check your filled information that matches your synapse profile ",
+              "and submit the <a href='", config$google_form_url, "' target='_blank'>google form</a>" , " again.<br><br>",
               footer
             )
-            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "mismatched names"), collapse = ","),
+            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "mismatched names\n"), collapse = ","),
               file = "log/out.log", append = TRUE
             ) # log
           }
-          invisible(syn$sendMessage(userIds = list(""), messageSubject = "Form Response Validation Results", messageBody = msg))
+          invisible(
+            syn$sendMessage(userIds = list(""), messageSubject = "Form Response Validation Results",
+                            messageBody = msg, contentType = "text/html")
+            )
         })
       )
     }
@@ -120,26 +123,32 @@ if (file.exists("tmp/after.csv")) {
           # if users not in the pre-registrant team, but already in the validate team, like admin
           if (usr %in% team2_memberIds) {
             msg <- paste0(
-              "Hello ", usr, ",\n\n",
-              "You are already in the validated team.\n\n",
+              "Hello ", usr, ",<br><br>",
+              "You are already in the validated team.<br><br>",
               footer
             )
-            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "already in the validated team"), collapse = ","),
+            # log
+            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "already in the validated team\n"), collapse = ","),
               file = "log/out.log", append = TRUE
-            ) # log
+            )
           } else { # if user not in either of team
             msg <- paste0(
-              "Hello ", usr, ",\n\n",
-              "You are not in the preregistrant team\n\n",
-              "Please register the challenge first and submit the google form again.\n\n",
+              "Hello ", usr, ",<br><br>",
+              "You are not in the preregistrant team<br><br>",
+              "Please register the challenge first and ",
+              "and submit the <a href='", config$google_form_url, "' target='_blank'>google form</a>" , " again.<br><br>",
               footer
             )
-            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "not in the preregistrant team"), collapse = ","),
+            # log
+            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "not in the preregistrant team\n"), collapse = ","),
               file = "log/out.log", append = TRUE
-            ) # log
+            )
           }
           # if username is incorrect, then you wont' get an email, since we cant get their userId
-          try(invisible(syn$sendMessage(userIds = list(""), messageSubject = "Form Response Validation Results", messageBody = msg)),
+          try(invisible(
+            syn$sendMessage(userIds = list(""), messageSubject = "Form Response Validation Results",
+                            messageBody = msg, contentType = "text/html")
+            ),
             silent = TRUE
           )
         })
@@ -147,7 +156,7 @@ if (file.exists("tmp/after.csv")) {
     }
   }
 
-  # replace old
-  unlink("tmp/after")
+  # remove cronR log and replace old
+  unlink(c("validateResponse.log", "tmp/after"))
   write_csv(response, "tmp/before.csv")
 }
