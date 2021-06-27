@@ -1,4 +1,4 @@
-Sys.setenv(TZ='UTC')
+Sys.setenv(TZ = "UTC")
 
 suppressPackageStartupMessages({
   library(googlesheets4)
@@ -42,10 +42,10 @@ syn$login(config$username, config$password, silent = TRUE)
 # need to successfully authenticate once in an interactive session
 suppressMessages(
   response <- remove_empty(
-    read_sheet(config$google_sheet_url, trim_ws = TRUE), 
+    read_sheet(config$google_sheet_url, trim_ws = TRUE),
     which = "rows"
   ) %>%
-  setNames(janitor::make_clean_names(colnames(.)))
+    setNames(janitor::make_clean_names(colnames(.)))
 )
 
 # if (any(sapply(questions, function(i) !i %in% colnames(response)))) stop("not all questions matched")

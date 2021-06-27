@@ -42,5 +42,3 @@ vignettes/*.pdf
 .Renviron
 config.R
 Dockerfile
-# requirements.R
-requirements.txt
