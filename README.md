@@ -21,10 +21,12 @@ Install r libraries
 RScript requirements.R
 ```
 
-Please **Modify** the information in `config_exmaple.R`, such as 'google form questions' and 'gmail address'.
+Please copy and **modify** the information in `config.R`, such as 'google form questions' and 'gmail address'. After all information is filled, set the file to read only.
 
 ```
 cp config_example.R config.R
+vi config.R
+chmod 400 config.R
 ```
 
 ## Usage

@@ -25,6 +25,9 @@ if (file.exists("tmp/after.csv")) {
       select(timestamp, questions[[1]], questions[[2]], questions[[3]]) %>%
       setNames(c("timestamp", "firstName", "lastName", "userName"))
 
+    # replace na to "NA" just in case
+    new_response[is.na(new_response)] <- "NA"
+    # get new submission user names
     new_usernames <- unique(new_response$userName)
 
     # find difference of users between two teams
@@ -68,7 +71,6 @@ if (file.exists("tmp/after.csv")) {
           if (identical(a, b)) { # if validate
             # invite to the team
             # syn$invite_to_team(config$validated_teamID, id)
-
             msg <- paste0(
               "Hello ", usr, ",<br><br>",
               "The invitation has been sent, please accept and join the validated Team.<br><br>",
@@ -123,8 +125,15 @@ if (file.exists("tmp/after.csv")) {
               "You are already in the validated team.<br><br>",
               footer
             )
+            id <- syn$getUserProfile(usr)["ownerId"]
             cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "already in the validated team\n"), collapse = ","),
               file = "log/out.log", append = TRUE
+            )
+            invisible(
+              syn$sendMessage(
+                userIds = list(""), messageSubject = "Form Response Validation Results",
+                messageBody = msg, contentType = "text/html"
+              )
             )
           } else { # if user not in either of team
             msg <- paste0(
@@ -134,25 +143,24 @@ if (file.exists("tmp/after.csv")) {
               "and submit the <a href='", config$google_form_url, "' target='_blank'>google form</a>", " again.<br><br>",
               footer
             )
-          }
-          
-          id <- try(syn$getUserProfile(usr), silent = TRUE)["ownerId"] # hope user don't give crazy username, "null", "NUL", ""
+            id <- try(syn$getUserProfile(usr), silent = TRUE)["ownerId"] # hope user don't give crazy username, "null", "NUL", ""
 
-          if (is.na(id)) {
-            # if username is incorrect, then you wont' get an email, since we cant get their userId
-            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "username not found\n"), collapse = ","),
-              file = "log/out.log", append = TRUE
-            )
-          } else {
-            cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "not in the preregistrant team\n"), collapse = ","),
-              file = "log/out.log", append = TRUE
-            )
-            invisible(
-              syn$sendMessage(
-                userIds = list(""), messageSubject = "Form Response Validation Results",
-                messageBody = msg, contentType = "text/html"
+            if (is.na(id)) {
+              # if username is incorrect, then you wont' get an email, since we cant get their userId
+              cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "username not found\n"), collapse = ","),
+                file = "log/out.log", append = TRUE
               )
-            )
+            } else {
+              cat(paste0(c(format(Sys.time(), " %Y-%m-%dT%H-%M-%S"), usr, "not in the preregistrant team\n"), collapse = ","),
+                file = "log/out.log", append = TRUE
+              )
+              invisible(
+                syn$sendMessage(
+                  userIds = list(""), messageSubject = "Form Response Validation Results",
+                  messageBody = msg, contentType = "text/html"
+                )
+              )
+            }
           }
         })
       )

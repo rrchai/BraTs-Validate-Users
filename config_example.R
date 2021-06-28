@@ -9,7 +9,6 @@ config <- list(
   preregistrant_teamID = "", # registrant team ID
   validated_teamID = "", # validated team ID
   your_email_address = "", # email address that have access to google form/sheet
-  working_dir_path = "", # <full-path/to/BraTs-Validate-Users/
   username = "", # <username of your synapse>
   password = "" # <password of your synapse>
 )

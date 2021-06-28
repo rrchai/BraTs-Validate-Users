@@ -8,6 +8,9 @@ suppressPackageStartupMessages({
   library(janitor)
 })
 
+# setwd(dirname(dirname(rstudioapi::getSourceEditorContext()$path)) # uncomment for rstudio
+# setwd(system("pwd", intern = TRUE)) # uncomment for Rscript
+
 # read config
 source("config.R")
 
@@ -40,6 +43,7 @@ syn$login(config$username, config$password, silent = TRUE)
 
 # Reading google sheet from response of form
 # need to successfully authenticate once in an interactive session
+# token will be store automatically; gs4_has_token()
 suppressMessages(
   response <- remove_empty(
     read_sheet(config$google_sheet_url, trim_ws = TRUE),
@@ -48,4 +52,4 @@ suppressMessages(
     setNames(janitor::make_clean_names(colnames(.)))
 )
 
-# if (any(sapply(questions, function(i) !i %in% colnames(response)))) stop("not all questions matched")
+if (any(sapply(questions, function(i) !i %in% colnames(response)))) stop("not all questions matched")
