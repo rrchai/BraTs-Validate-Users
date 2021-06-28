@@ -1,11 +1,12 @@
 # BraTs-Validate-Usersif
 
-This is a tool to monitor google form response. Technically, it is watching in the google sheet that save the google form's response. It wil detect for new submission every minute and validate the new submission's information by followings:
+This is a tool to monitor google form responses. Technically, it is watching the google sheet that saves the google form's responses. The tool will detect for new submissions every minute and validate the new submission's information by followings:
 
 - whether the user name is in the preregistration team, but not the validated team
 - whether first name and last name match
 - whether user name is valid
 
+Note: it is now not super friendly set up for non-R users and will improve if needed.
 ## Installation
 
 Clone the repo
