@@ -56,6 +56,9 @@ if (file.exists("tmp/after.csv")) {
     if (length(waitList_users) != 0) {
       invisible(
         lapply(waitList_users, function(usr) {
+
+          id <- syn$getUserProfile(usr)["ownerId"]
+
           # compare first name, last name and user name
           a <- new_response %>%
             filter(userName == usr) %>%
@@ -70,7 +73,7 @@ if (file.exists("tmp/after.csv")) {
 
           if (identical(a, b)) { # if validate
             # invite to the team
-            # syn$invite_to_team(config$validated_teamID, id)
+            syn$invite_to_team(config$validated_teamID, id)
             msg <- paste0(
               "Hello ", usr, ",<br><br>",
               "The invitation has been sent, please accept and join the validated Team.<br><br>",
@@ -99,10 +102,9 @@ if (file.exists("tmp/after.csv")) {
               file = "log/out.log", append = TRUE
             )
           }
-          id <- syn$getUserProfile(usr)["ownerId"]
           invisible(
             syn$sendMessage(
-              userIds = list(""), messageSubject = "Form Response Validation Results",
+              userIds = list(id), messageSubject = "Form Response Validation Results",
               messageBody = msg, contentType = "text/html"
             )
           )
@@ -131,7 +133,7 @@ if (file.exists("tmp/after.csv")) {
             )
             invisible(
               syn$sendMessage(
-                userIds = list(""), messageSubject = "Form Response Validation Results",
+                userIds = list(id), messageSubject = "Form Response Validation Results",
                 messageBody = msg, contentType = "text/html"
               )
             )
@@ -156,7 +158,7 @@ if (file.exists("tmp/after.csv")) {
               )
               invisible(
                 syn$sendMessage(
-                  userIds = list(""), messageSubject = "Form Response Validation Results",
+                  userIds = list(id), messageSubject = "Form Response Validation Results",
                   messageBody = msg, contentType = "text/html"
                 )
               )
